@@ -1,18 +1,40 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function CreatePostPage() {
+
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+
+  const [communities, setCommunities] = useState<any[]>([]);
   const [communityId, setCommunityId] = useState("");
 
-  const handleCreatePost = async () => {
+  useEffect(() => {
+
+    async function fetchCommunities() {
+
+      const res = await fetch("/api/community");
+
+      const data = await res.json();
+
+      setCommunities(data);
+    }
+
+    fetchCommunities();
+
+  }, []);
+
+  async function createPost() {
+
     const res = await fetch("/api/post", {
+
       method: "POST",
+
       headers: {
         "Content-Type": "application/json",
       },
+
       body: JSON.stringify({
         title,
         content,
@@ -22,68 +44,67 @@ export default function CreatePostPage() {
 
     const data = await res.json();
 
-    if (res.ok) {
-      alert("Post Created Successfully 🚀");
+    alert("Post Created 🚀");
 
-      setTitle("");
-      setContent("");
-      setCommunityId("");
-    } else {
-      alert(data.error);
-    }
-  };
+    console.log(data);
+  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-100 via-white to-orange-200 px-4 py-10">
 
-      <div className="w-full max-w-2xl bg-white/80 backdrop-blur-lg border border-white/40 shadow-2xl rounded-3xl p-10">
+    <div className="min-h-screen bg-gradient-to-br from-orange-100 via-white to-orange-200 flex items-center justify-center p-8">
 
-        <div className="text-center mb-10">
+      <div className="bg-white shadow-2xl rounded-3xl p-10 w-full max-w-2xl">
 
-          <h1 className="text-5xl font-extrabold text-orange-500">
-            Create Post
-          </h1>
+        <h1 className="text-5xl font-extrabold text-orange-500 mb-8">
 
-          <p className="text-gray-500 mt-3 text-lg">
-            Share your thoughts with the community 🚀
-          </p>
+          Create Post 🚀
 
-        </div>
+        </h1>
 
-        <div className="space-y-6">
+        <input
+          type="text"
+          placeholder="Post Title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="w-full p-4 rounded-2xl border mb-5 outline-none"
+        />
 
-          <input
-            type="text"
-            placeholder="Enter post title"
-            value={title}
-            className="w-full p-5 rounded-2xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all text-lg"
-            onChange={(e) => setTitle(e.target.value)}
-          />
+        <textarea
+          placeholder="Post Content"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          className="w-full p-4 rounded-2xl border mb-5 outline-none h-40"
+        />
 
-          <textarea
-            placeholder="Write your post content..."
-            rows={6}
-            value={content}
-            className="w-full p-5 rounded-2xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all text-lg"
-            onChange={(e) => setContent(e.target.value)}
-          />
+        <select
+          value={communityId}
+          onChange={(e) => setCommunityId(e.target.value)}
+          className="w-full p-4 rounded-2xl border mb-6 outline-none"
+        >
 
-          <input
-            type="text"
-            placeholder="Enter community ID"
-            value={communityId}
-            className="w-full p-5 rounded-2xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all text-lg"
-            onChange={(e) => setCommunityId(e.target.value)}
-          />
+          <option value="">
+            Select Community
+          </option>
 
-          <button
-            onClick={handleCreatePost}
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white p-5 rounded-2xl font-bold text-xl shadow-lg transition-all duration-300"
-          >
-            Create Post
-          </button>
+          {communities.map((community) => (
 
-        </div>
+            <option
+              key={community.id}
+              value={community.id}
+            >
+              {community.name}
+            </option>
+
+          ))}
+
+        </select>
+
+        <button
+          onClick={createPost}
+          className="w-full bg-orange-500 hover:bg-orange-600 text-white py-4 rounded-2xl font-bold text-xl transition"
+        >
+          Create Post
+        </button>
 
       </div>
 

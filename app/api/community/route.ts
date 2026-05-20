@@ -3,6 +3,13 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+export async function GET() {
+
+  const communities = await prisma.community.findMany();
+
+  return NextResponse.json(communities);
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();

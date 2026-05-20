@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String @id @default(cuid())
+  email    String @unique
+  password String
+}
+model Community {
+  id    String @id @default(cuid())
+  name  String @unique
+
+  posts Post[]
+}
+
+model Post {
+  id          String   @id @default(cuid())
+  title       String
+  content     String
+  createdAt   DateTime @default(now())
+
+  communityId String
+  community   Community @relation(fields: [communityId], references: [id])
+comments    Comment[]
+  votes       Vote[]
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  text      String
+  createdAt DateTime @default(now())
+
+  postId    String
+  post      Post @relation(fields: [postId], references: [id])
+}
+
+model Vote {
+  id      String @id @default(cuid())
+  value   Int
+
+  postId  String
+  post    Post @relation(fields: [postId], references: [id])
+}
